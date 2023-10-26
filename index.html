@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monte Carlo Integration</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <h1>Monte Carlo Integration</h1>
+
+    <div id="content">
+        <label for="simulations">Número de simulaciones (1-1000):</label>
+        <input type="number" id="simulations" min="1" max="1000">
+        <button onclick="runMonteCarlo()">Calcular</button>
+
+        <div id="output">
+            <p><strong>Real valor de la integral:</strong> <span id="realValue"></span></p>
+            <p><strong>Aproximación por Monte Carlo:</strong> <span id="monteCarloValue"></span></p>
+            <p><strong>Error de porcentaje:</strong> <span id="errorPercentage"></span>%</p>
+        </div>
+
+        <div id="success-alert" style="display: none;">
+            <p>¡Cálculo completado con éxito!</p>
+        </div>
+
+        <div id="error-alert">
+            <p>Por favor, ingrese un número válido (entre 1 y 1000).</p>
+        </div>
+    </div>
+
+    <script>
+        function runMonteCarlo() {
+            const simulationsInput = document.getElementById("simulations");
+            const simulations = parseInt(simulationsInput.value);
+
+            if (simulations <= 0 || simulations > 1000) {
+                document.getElementById("error-alert").style.display = "block";
+                return;
+            }
+
+            document.getElementById("error-alert").style.display = "none";
+
+            const realValue = calculateRealIntegral();
+            const monteCarloValue = monteCarloIntegration(simulations);
+            const errorPercentage = calculateError(realValue, monteCarloValue);
+
+            document.getElementById("realValue").textContent = realValue.toFixed(4);
+            document.getElementById("monteCarloValue").textContent = monteCarloValue.toFixed(4);
+            document.getElementById("errorPercentage").textContent = errorPercentage.toFixed(2);
+
+            document.getElementById("success-alert").style.display = "block";
+
+            setTimeout(function () {
+                document.getElementById("success-alert").style.display = "none";
+            }, 3000);
+        }
+
+        function calculateRealIntegral() {
+            const a = 2;
+            const b = 3;
+            const realValue = ((b ** 3 - a ** 3) * 3 / 3) + ((b ** 2 - a ** 2) * 2 / 2);
+            return realValue;
+        }
+
+        function monteCarloIntegration(simulations) {
+            const a = 2;
+            const b = 3;
+            let sum = 0;
+
+            for (let i = 0; i < simulations; i++) {
+                const randomX = Math.random() * (b - a) + a;
+                const fx = 3 * randomX ** 2 + 2 * randomX;
+                sum += fx;
+            }
+
+            const average = sum / simulations;
+            const monteCarloValue = (b - a) * average;
+            return monteCarloValue;
+        }
+
+        function calculateError(realValue, monteCarloValue) {
+            const error = Math.abs(realValue - monteCarloValue);
+            const errorPercentage = (error / realValue) * 100;
+            return errorPercentage;
+        }
+    </script>
+</body>
+</html>
